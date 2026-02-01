@@ -2,75 +2,68 @@
 import { LogEntry, ProjectLog } from "../types";
 
 /**
- * Aerie Project Logging Service
- * Handles the collection and exportation of user prompts.
- * Note: Browser security prevents direct filesystem writes. 
- * Use 'exportToProjectFolder()' to generate a file for your /logs directory.
+ * Aerie Master Logging Service
+ * Consolidates all user-AI interactions.
  */
 
-class LoggingService {
-  private currentSession: ProjectLog;
+export class LoggingService {
+  private masterLog: ProjectLog;
 
   constructor() {
-    this.currentSession = {
-      sessionId: `AERIE-SES-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      sessionStart: new Date().toISOString(),
-      platform: "Aerie Web Platform",
-      entries: []
+    this.masterLog = {
+      masterId: "AERIE-MASTER-LOG-001",
+      lastUpdated: new Date().toISOString(),
+      platform: "Aerie Education Portal",
+      history: []
     };
   }
 
   /**
-   * Captures a user prompt in the current active session
+   * Logs a complete turn (User Prompt + AI Response)
    */
-  public logUserPrompt(prompt: string, context: string = "general_chat") {
+  public logInteraction(prompt: string, response: string, context: string = "chatbot") {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       prompt,
+      response,
       context
     };
     
-    this.currentSession.entries.push(entry);
+    this.masterLog.history.push(entry);
+    this.masterLog.lastUpdated = entry.timestamp;
     
-    // Developer Console Mirror
-    console.debug(`[PROMPT LOGGED] ${entry.timestamp}: ${prompt}`);
-    
-    // Optional: If you implement a backend, call it here:
-    // fetch('/api/logs', { method: 'POST', body: JSON.stringify(entry) });
+    // Log to console for real-time visibility in Vercel Dashboard
+    console.log("--- AERIE INTERACTION ---");
+    console.log(JSON.stringify(entry, null, 2));
   }
 
   /**
-   * Prepares and triggers a download of the session logs.
-   * Save this file into your project's /logs/ folder.
+   * Generates the single AERIE_MASTER_LOG.json file for the current user.
    */
-  public exportToProjectFolder() {
-    if (this.currentSession.entries.length === 0) {
-      return { success: false, message: "No logs captured in this session yet." };
+  public syncToMasterFile() {
+    if (this.masterLog.history.length === 0) {
+      return { success: false, message: "No conversation history to sync yet." };
     }
 
-    const dataStr = JSON.stringify(this.currentSession, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    
-    const dateTag = new Date().toISOString().split('T')[0];
-    const fileName = `AERIE_SESSION_${dateTag}_${this.currentSession.sessionId}.json`;
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    return { success: true, fileName };
+    try {
+      const dataStr = JSON.stringify(this.masterLog, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `AERIE_MASTER_LOG.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      return { success: true, fileName: "AERIE_MASTER_LOG.json" };
+    } catch (e) {
+      return { success: false, message: "Sync failed." };
+    }
   }
 
-  public getSessionStats() {
-    return {
-      count: this.currentSession.entries.length,
-      start: this.currentSession.sessionStart
-    };
+  public getLogCount() {
+    return this.masterLog.history.length;
   }
 }
 
