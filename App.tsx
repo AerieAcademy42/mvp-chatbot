@@ -15,11 +15,13 @@ const App: React.FC = () => {
   const startTest = async (config: TestConfig) => {
     setIsGenerating(true);
     try {
+      // The service now handles its own fallback, so it should always return questions
       const generated = await generateMockQuestions(config.subject, config.difficulty);
       setQuestions(generated);
       setView('mockTest');
     } catch (error) {
-      alert("Something went wrong. Please check your connection and try again.");
+      console.error("App: Failed to start test:", error);
+      alert("Test initialization failed. Please try again or contact support.");
     } finally {
       setIsGenerating(false);
     }
@@ -79,7 +81,7 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            {/* GATE Results Image Section - Using public/gate-results.png */}
+            {/* GATE Results Image */}
             <div className="flex-1 relative w-full">
                <div className="absolute -z-10 bg-[#3498DB]/10 w-full h-[120%] -top-[10%] rounded-full blur-[100px] opacity-60"></div>
                <div className="relative overflow-hidden rounded-[40px] shadow-2xl border-8 border-white group">
@@ -137,31 +139,9 @@ const App: React.FC = () => {
         <footer className="bg-white border-t border-gray-100 py-24 px-6 mt-32">
            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
               <div className="space-y-6">
-                 {/* Enhanced Footer Logo with dynamic image handling */}
                  <div className="relative inline-block mb-6">
-                   <img 
-                     src="/logo.png" 
-                     alt="Aerie Academy" 
-                     className="h-16 w-auto object-contain relative z-10"
-                     onError={(e) => {
-                       const target = e.target as HTMLImageElement;
-                       target.style.display = 'none';
-                       const fallback = target.nextElementSibling as HTMLElement;
-                       if (fallback) fallback.classList.remove('hidden');
-                     }}
-                   />
-                   {/* Stylish Fallback UI */}
-                   <div className="hidden flex items-center gap-3">
-                      <div className="w-12 h-12 bg-[#1A5276] rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg">
-                        A
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-2xl font-black text-[#1A5276] tracking-tighter leading-none">AERIE</span>
-                        <span className="text-[9px] font-black text-[#3498DB] tracking-[0.4em] uppercase">Academy</span>
-                      </div>
-                   </div>
+                   <img src="/logo.png" alt="Aerie Academy" className="h-16 w-auto object-contain" />
                  </div>
-                 
                  <p className="text-gray-400 font-bold text-xs tracking-widest uppercase">Empowering Architects since 2020</p>
                  <div className="flex flex-col gap-3 text-sm text-gray-500 font-bold">
                     <span className="flex items-center gap-2">
@@ -172,36 +152,16 @@ const App: React.FC = () => {
                        <svg className="w-4 h-4 text-[#3498DB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                        aerie.architecture@gmail.com
                     </span>
-                    <span className="flex items-center gap-2">
-                       <svg className="w-4 h-4 text-[#3498DB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                       +91 9799333490
-                    </span>
                  </div>
               </div>
               <div className="grid grid-cols-2 gap-20">
                  <div>
                     <h5 className="font-black text-[#1A5276] mb-6 uppercase text-xs tracking-[0.2em]">Exams</h5>
                     <ul className="space-y-3 text-xs text-gray-400 font-black uppercase tracking-widest">
-                       <li className="hover:text-[#3498DB] cursor-pointer transition-colors">GATE Architecture</li>
-                       <li className="hover:text-[#3498DB] cursor-pointer transition-colors">JEE Paper 2</li>
-                       <li className="hover:text-[#3498DB] cursor-pointer transition-colors">NATA</li>
+                       <li>GATE Architecture</li>
+                       <li>JEE Paper 2</li>
                     </ul>
                  </div>
-                 <div>
-                    <h5 className="font-black text-[#1A5276] mb-6 uppercase text-xs tracking-[0.2em]">Quick Links</h5>
-                    <ul className="space-y-3 text-xs text-gray-400 font-black uppercase tracking-widest">
-                       <li onClick={() => setView('testSetup')} className="hover:text-[#3498DB] cursor-pointer transition-colors">Mock Test</li>
-                       <li className="hover:text-[#3498DB] cursor-pointer transition-colors">Mentorship</li>
-                       <li onClick={() => window.open('https://www.aerieacademy.com/courses', '_blank')} className="hover:text-[#3498DB] cursor-pointer transition-colors">Courses</li>
-                    </ul>
-                 </div>
-              </div>
-           </div>
-           <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-gray-50 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">
-              <p>© 2025 Aerie Academy. All Rights Reserved.</p>
-              <div className="flex gap-8">
-                <span>Privacy Policy</span>
-                <span>Terms of Service</span>
               </div>
            </div>
         </footer>
