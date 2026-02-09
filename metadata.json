@@ -1,0 +1,7 @@
+{
+  "name": "mvp_bot",
+  "description": "A premier launching page for Aerie, an architectural education platform featuring an AI-driven chatbot and JEE-styled mock testing interface.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
